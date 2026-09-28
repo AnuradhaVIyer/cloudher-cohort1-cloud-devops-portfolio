@@ -13,3 +13,7 @@ output "Security_Group_Id" {
 output "EC2_Instance_Id" {
   value = aws_instance.devops-lab-web-server.id
 }
+
+output "EC2_Instance_Public_IP" {
+  value = aws_instance.devops-lab-web-server.public_ip
+}
