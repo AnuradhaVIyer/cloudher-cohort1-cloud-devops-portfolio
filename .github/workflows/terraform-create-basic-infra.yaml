@@ -1,4 +1,4 @@
-name: "Terraform Create Basic Infrastructure"
+name: "Terraform Create Basic Infrastructure v2""
 
 on:
   push:
