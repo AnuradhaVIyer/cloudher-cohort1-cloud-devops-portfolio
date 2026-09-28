@@ -7,3 +7,14 @@ terraform {
     }
   }
 }
+
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      project = var.project_prefix
+      env     = var.env_prefix
+    }
+  }
+}

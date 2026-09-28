@@ -16,6 +16,12 @@ variable "subnet_cidr" {
   default     = "10.0.1.0/24"
 }
 
+variable "instance_type" {
+  description = "The type of EC2 instance to create"
+  type        = string
+  default     = "t3.micro" 
+}
+
 variable "env_prefix" {
   description = "The prefix for the environment"
   type        = string
@@ -25,5 +31,5 @@ variable "env_prefix" {
 variable "project_prefix" {
   description = "The prefix for the project"
   type        = string
-  default     = "devops-portfolio"
+  default     = "devops-lab"
 }
