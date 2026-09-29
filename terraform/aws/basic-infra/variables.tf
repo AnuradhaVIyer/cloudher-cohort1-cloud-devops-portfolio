@@ -19,7 +19,7 @@ variable "subnet_cidr" {
 variable "instance_type" {
   description = "The type of EC2 instance to create"
   type        = string
-  default     = "t3.micro" 
+  default     = "t3.micro"
 }
 
 variable "env_prefix" {
