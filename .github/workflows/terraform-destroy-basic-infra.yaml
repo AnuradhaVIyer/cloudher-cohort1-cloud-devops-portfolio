@@ -1,0 +1,49 @@
+name: "Terraform Destroy Basic Infrastructure"
+
+on:
+    workflow_dispatch:
+        inputs:
+            branch:
+                description: "Select the branch to run the workflow on"
+                required: true
+                default: "main"
+            environments:
+                description: "Select the environment to destroy"
+                required: true
+                default: "dev"
+
+permissions:
+    id-token: write
+    contents: read
+
+env:
+    TF_VERSION: "1.11.0"
+    TF_WORKING_DIR: terraform/aws/basic-infra
+
+jobs:
+    terraform:
+        name: "Use Terraform to destroy basic infrastructure"
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v3
+
+            - name: "Setup Terraform"
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: ${{ env.TF_VERSION }}
+
+            - name: "Configure AWS credentials"
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: "Terraform Init"
+              working-directory: ${{ env.TF_WORKING_DIR }}
+              run: terraform init
+
+            - name: "Terraform Destroy"
+              working-directory: ${{ env.TF_WORKING_DIR }}
+              run: terraform destroy -auto-approve
