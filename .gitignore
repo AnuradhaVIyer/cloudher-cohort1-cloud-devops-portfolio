@@ -7,3 +7,4 @@ Useful Commands.txt
 terraform/**/*.tfstate
 terraform/**/*.tfstate.*
 terraform/**/.terraform/
+terraform/**/.terraform/
