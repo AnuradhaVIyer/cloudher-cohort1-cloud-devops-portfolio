@@ -1,3 +1,9 @@
 Useful Commands.txt
 .terraform
 .terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+**/.terraform/
+terraform/**/*.tfstate
+terraform/**/*.tfstate.*
+terraform/**/.terraform/
