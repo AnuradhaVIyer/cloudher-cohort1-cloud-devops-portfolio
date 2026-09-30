@@ -101,6 +101,13 @@ resource "aws_security_group" "devops-lab-sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    description = "SSH traffic"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["110.226.182.107/32"]
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -118,7 +125,7 @@ resource "aws_security_group" "devops-lab-sg" {
 # ---------------------------------------------------------
 resource "aws_key_pair" "ec2_key_pair" {
   key_name   = "dev-devops-lab-ec2-key"
-  public_key = file("~/.ssh/dev-devops-lab-ec2-key.pub")
+  public_key = var.ec2_public_key
 }
 
 # ---------------------------------------------------------
@@ -130,7 +137,6 @@ resource "aws_instance" "devops-lab-web-server" {
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.devops-lab-subnet-public.id
   vpc_security_group_ids = [aws_security_group.devops-lab-sg.id]
-  iam_instance_profile   = aws_iam_instance_profile.ec2.name
   key_name               = aws_key_pair.ec2_key_pair.key_name
 
   root_block_device {

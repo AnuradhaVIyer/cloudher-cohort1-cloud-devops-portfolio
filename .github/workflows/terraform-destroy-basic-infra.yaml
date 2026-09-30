@@ -3,14 +3,15 @@ name: "Terraform Destroy Basic Infrastructure"
 on:
     workflow_dispatch:
         inputs:
-            branch:
-                description: "Select the branch to run the workflow on"
-                required: true
-                default: "main"
-            environments:
-                description: "Select the environment to destroy"
-                required: true
-                default: "dev"
+          environment:
+            description: 'Target environment to deploy to'
+            required: true
+            default: 'dev'
+            type: choice
+            options:
+            - dev
+            - staging
+            - prod
 
 permissions:
     id-token: write
@@ -24,6 +25,8 @@ jobs:
     terraform:
         name: "Use Terraform to destroy basic infrastructure"
         runs-on: ubuntu-latest
+
+        environment: ${{ inputs.environment }}
 
         steps:
             - name: "Checkout"
@@ -45,5 +48,7 @@ jobs:
               run: terraform init
 
             - name: "Terraform Destroy"
+              env:
+               TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
               working-directory: ${{ env.TF_WORKING_DIR }}
               run: terraform destroy -auto-approve

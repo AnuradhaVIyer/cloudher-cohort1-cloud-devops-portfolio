@@ -9,6 +9,16 @@ on:
       - "terraform/aws/basic-infra/**"
 
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
 
 permissions:
   id-token: write
@@ -17,7 +27,7 @@ permissions:
 env:
   TF_VERSION: "1.11.0"
   TF_WORKING_DIR: terraform/aws/basic-infra
-  
+
 jobs:
   terraform:
     name: "Use Terraform to create basic infrastructure"
@@ -25,7 +35,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3
@@ -51,9 +61,13 @@ jobs:
         run: terraform validate
 
       - name: "Terraform Plan"
+        env:
+          TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }} # Evaluates AFTER environment binding
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan
+        run: terraform plan -out=tfplan
 
       - name: "Terraform Apply"
+        env:
+          TF_VAR_ec2_public_key: ${{ secrets.EC2_PUBLIC_KEY }}
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve
+        run: terraform apply tfplan
