@@ -1,33 +1,23 @@
 # ---------------------------------------------------------
-# Amazon Linux 2023 AMI
+# Dynamic Data Source for latest Ubuntu 24.04 LTS AMI
 # ---------------------------------------------------------
-data "aws_ami" "amazon_linux" {
+data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["099720109477"] # Canonical's official AWS Account ID
 
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64"]
-  }
-
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 }
 
@@ -124,47 +114,24 @@ resource "aws_security_group" "devops-lab-sg" {
 }
 
 # ---------------------------------------------------------
-# SSM Role and Instance Profile for EC2
+# AWS Key Pair for SSH access to EC2 instance
 # ---------------------------------------------------------
-
-resource "aws_iam_role" "ec2_ssm_role" {
-  name = "${var.env_prefix}-ec2-ssm-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-
-    Statement = [{
-      Effect = "Allow"
-
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ssm" {
-  role       = aws_iam_role.ec2_ssm_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "ec2" {
-  name = "${var.env_prefix}-ec2-instance-profile"
-  role = aws_iam_role.ec2_ssm_role.name
+resource "aws_key_pair" "ec2_key_pair" {
+  key_name   = "dev-devops-lab-ec2-key"
+  public_key = file("~/.ssh/dev-devops-lab-ec2-key.pub")
 }
 
 # ---------------------------------------------------------
-# EC2 Instance
+# EC2 Instance (Ubuntu 24.04 LTS)
 # ---------------------------------------------------------
 
 resource "aws_instance" "devops-lab-web-server" {
-  ami                    = data.aws_ami.amazon_linux.id
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.devops-lab-subnet-public.id
   vpc_security_group_ids = [aws_security_group.devops-lab-sg.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
+  key_name               = aws_key_pair.ec2_key_pair.key_name
 
   root_block_device {
     volume_size           = 8
