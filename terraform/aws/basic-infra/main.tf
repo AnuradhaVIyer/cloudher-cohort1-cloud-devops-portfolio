@@ -103,9 +103,9 @@ resource "aws_security_group" "devops-lab-sg" {
   }
   ingress {
     description = "SSH traffic"
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["110.226.182.107/32"]
   }
   egress {
