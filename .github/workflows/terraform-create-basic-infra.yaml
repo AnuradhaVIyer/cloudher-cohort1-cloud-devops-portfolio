@@ -33,9 +33,6 @@ jobs:
     name: "Use Terraform to create basic infrastructure"
     runs-on: ubuntu-latest
 
-    # Fallback to 'dev' when triggered by git push instead of workflow_dispatch
-    environment: ${{ github.event.inputs.environment || 'dev' }}
-
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
