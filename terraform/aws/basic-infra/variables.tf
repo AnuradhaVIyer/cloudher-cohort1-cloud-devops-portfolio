@@ -16,6 +16,11 @@ variable "subnet_cidr" {
   default     = "10.0.1.0/24"
 }
 
+variable "ec2_public_key" {
+  description = "The public key for the EC2 instance"
+  type        = string
+}
+
 variable "instance_type" {
   description = "The type of EC2 instance to create"
   type        = string
